@@ -9,6 +9,22 @@ The motivation behind this project is to create a technological means to contrib
 
 ## Technical Overview
 
+Current file structure
+
+```text
+├── LICENSE
+├── Makefile
+├── README.md
+├── cmd
+│   └── server
+│       ├── Dockerfile
+│       └── main.go
+├── config
+│   └── local.yml
+├── go.mod
+└── go.sum
+```
+
 # Getting Started
 
 # Project Layout
