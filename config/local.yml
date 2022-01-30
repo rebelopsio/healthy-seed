@@ -1,0 +1,2 @@
+dsn: "This is the dsn"
+jwt_signing_key: "This is the jwt signing key"
