@@ -42,7 +42,7 @@ func main() {
 
 	// fmt.Println(&configParams.DSN, &configParams.JwtSigningKey)
 	http.HandleFunc("/", handler) // Each request calls handler
-	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8000", nil))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

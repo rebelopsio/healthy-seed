@@ -16,6 +16,10 @@ help: ## help information about make commands
 run: ## run the API server
 	go run ${LDFLAGS} cmd/server/main.go
 
+.PHONY: build
+build:  ## build the API server binary
+	CGO_ENABLED=0 go build ${LDFLAGS} -a -o server $(MODULE)/cmd/server
+
 .PHONY: build-docker
 build-docker: ## build the API server as a docker image
 	docker build -f cmd/server/Dockerfile -t server .
