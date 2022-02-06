@@ -1,0 +1,159 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tkn-pv
+  namespace: "tekton-builds"
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  local:
+    path: "/files"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - tekton-cluster-test-control-plane
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tkn-pvc
+  namespace: "tekton-builds"
+spec:
+  storageClassName: local-storage
+  volumeName: tkn-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: git-clone-build
+  namespace: tekton-builds
+spec:
+  params:
+  - name: appName
+    default: healthy-seed
+  - name: containerVer
+    default: "0.0.1"
+  workspaces:
+    - name: pipeline-ws
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: task-git-clone
+      workspaces:
+        - name: source
+          workspace: pipeline-ws
+      params:
+        - name: gitUrl
+          value: git://github.com/rebelopsio/healthy-seed
+    - name: build-container-image
+      taskRef:
+        name: task-build-and-push
+      workspaces:
+        - name: source
+          workspace: pipeline-ws
+      params:
+        - name: appName
+          value: healthy-seed
+        - name: dockerUser
+          value: rebelopsio
+      runAfter:
+        - git-clone
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-git-clone
+  namespace: tekton-builds
+spec:
+  params:
+    - name: gitUrl
+      type: string
+      description: URL to github repo
+      default: ""
+  steps:
+    - image: "bitnami/git"
+      name: "clone"
+      resources: { }
+      script: "cd $(workspaces.source.path)\ngit clone $(params.gitUrl)\n"
+  workspaces:
+    - name: "source"
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-build-and-push
+  namespace: tekton-builds
+spec:
+  params:
+  - name: pathToDockerFile
+    type: string
+    description: The path to the dockerfile to build
+    default: $(params.docker-source.path)/cmd/server/Dockerfile
+  - name: pathToContext
+    type: string
+    description: |
+      The build context used by Kaniko
+      (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+    default: $(params.docker-source.path)
+  - name: docker-source
+    type: string
+    description: The path where files were downloaded via git
+    default: $(workspaces.source.path)
+  - name: appName
+    type: string
+    description: name of application
+    default: "demo"
+  - name: containerVer
+    type: string
+    description: the version of your container
+    default: "latest"
+  - name: dockerUser
+    type: string
+    description: the docker username where you'll push an image
+    default: "rebelopsio"
+  - name: registryDest
+    type: string
+    description: where the image should go
+    default: "$(params.dockerUser)/$(params.appName):$(params.containerVer)"
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
+#      env:
+#        - name: "DOCKER_CONFIG"
+#          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(params.registryDest)
+        - --context=$(params.pathToContext)
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker/
+  workspaces:
+    - name: "source"
