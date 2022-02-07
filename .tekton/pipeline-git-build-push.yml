@@ -3,24 +3,15 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tkn-pv
-  namespace: "tekton-builds"
 spec:
+  storageClassName: ""
   capacity:
     storage: 1Gi
-  volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
-  storageClassName: local-storage
-  local:
-    path: "/files"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-              - tekton-cluster-test-control-plane
+    - ReadWriteMany
+  hostPath:
+    path: "/tmp/data"
+
 
 ---
 apiVersion: v1
@@ -29,7 +20,7 @@ metadata:
   name: tkn-pvc
   namespace: "tekton-builds"
 spec:
-  storageClassName: local-storage
+  storageClassName: ""
   volumeName: tkn-pv
   accessModes:
     - ReadWriteMany
@@ -45,10 +36,10 @@ metadata:
   namespace: tekton-builds
 spec:
   params:
-  - name: appName
-    default: healthy-seed
-  - name: containerVer
-    default: "0.0.1"
+    - name: appName
+      default: healthy-seed
+    - name: containerVer
+      default: "0.0.1"
   workspaces:
     - name: pipeline-ws
   tasks:
@@ -102,36 +93,36 @@ metadata:
   namespace: tekton-builds
 spec:
   params:
-  - name: pathToDockerFile
-    type: string
-    description: The path to the dockerfile to build
-    default: $(params.docker-source.path)/cmd/server/Dockerfile
-  - name: pathToContext
-    type: string
-    description: |
-      The build context used by Kaniko
-      (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-    default: $(params.docker-source.path)
-  - name: docker-source
-    type: string
-    description: The path where files were downloaded via git
-    default: $(workspaces.source.path)
-  - name: appName
-    type: string
-    description: name of application
-    default: "demo"
-  - name: containerVer
-    type: string
-    description: the version of your container
-    default: "latest"
-  - name: dockerUser
-    type: string
-    description: the docker username where you'll push an image
-    default: "rebelopsio"
-  - name: registryDest
-    type: string
-    description: where the image should go
-    default: "$(params.dockerUser)/$(params.appName):$(params.containerVer)"
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(params.docker-source.path)/cmd/server/Dockerfile
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(params.docker-source.path)
+    - name: docker-source
+      type: string
+      description: The path where files were downloaded via git
+      default: $(workspaces.source.path)
+    - name: appName
+      type: string
+      description: name of application
+      default: "demo"
+    - name: containerVer
+      type: string
+      description: the version of your container
+      default: "latest"
+    - name: dockerUser
+      type: string
+      description: the docker username where you'll push an image
+      default: "rebelopsio"
+    - name: registryDest
+      type: string
+      description: where the image should go
+      default: "$(params.dockerUser)/$(params.appName):$(params.containerVer)"
   volumes:
     - name: kaniko-secret
       secret:
@@ -143,9 +134,9 @@ spec:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:latest
       # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
-#      env:
-#        - name: "DOCKER_CONFIG"
-#          value: "/tekton/home/.docker/"
+      #      env:
+      #        - name: "DOCKER_CONFIG"
+      #          value: "/tekton/home/.docker/"
       command:
         - /kaniko/executor
       args:
