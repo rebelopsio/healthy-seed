@@ -9,7 +9,10 @@ The motivation behind this project is to create a technological means to contrib
 
 ## Technical Overview
 
-Current file structure
+### Authentication
+After a recommendation from [Luke Hinds](https://github.com/lukehinds), we'll be looking to implement [Paseto](https://github.com/o1egl/paseto) over JWT.
+
+### Current file structure
 
 ```text
 ├── LICENSE
@@ -18,11 +21,13 @@ Current file structure
 ├── cmd
 │   └── server
 │       ├── Dockerfile
+│       ├── init.sh
 │       └── main.go
 ├── config
 │   └── local.yml
 ├── go.mod
 └── go.sum
+
 ```
 
 # Getting Started

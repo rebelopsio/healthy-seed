@@ -35,3 +35,24 @@ lint: ## run golint on all Go package
 .PHONY: fmt
 fmt: ## run "go fmt" on all Go packages
 	@go fmt $(PACKAGES)
+
+.PHONY: postgres
+postgres:
+	docker run --name postgres14 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
+
+.PHONY: createdb
+createdb:
+	docker exec -it postgres14 createdb --username=root --owner=root healthy_seed
+
+.PHONY: dropdb
+dropdb:
+	docker exec -it postgres14 dropdb healthy_seed
+
+.PHONY: migrateup
+migrateup:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable" -verbose up
+
+.PHONY: migratedown
+migratedown:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable" -verbose down
+
