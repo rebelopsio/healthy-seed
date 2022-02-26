@@ -56,3 +56,6 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable" -verbose down
 
+.PHONY: sqlc
+sqlc:
+	sqlc generate -f ./config/sqlc.yaml
