@@ -1,3 +1,15 @@
+-- name: CreateMacros :one
+INSERT INTO macros
+    (
+    account_id,
+    calories,
+    protein,
+    carbs,
+    fats
+) VALUES (
+    $1, $2, $3, $4, $5
+) RETURNING *;
+
 -- name: ListMacros :one
 SELECT * FROM macros
 WHERE account_id = $1 LIMIT 1;
