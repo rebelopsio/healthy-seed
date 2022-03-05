@@ -37,22 +37,25 @@ fmt: ## run "go fmt" on all Go packages
 	@go fmt $(PACKAGES)
 
 .PHONY: postgres
-postgres:
+postgres: ## run a postgres container in docker
 	docker run --name postgres14 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
 
 .PHONY: createdb
-createdb:
+createdb: # create the db on the postgres docker container
 	docker exec -it postgres14 createdb --username=root --owner=root healthy_seed
 
 .PHONY: dropdb
-dropdb:
+dropdb: ## drop the db on the postgres docker container
 	docker exec -it postgres14 dropdb healthy_seed
 
 .PHONY: migrateup
-migrateup:
+migrateup: ## run the db migration up on the postgres docker container
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable" -verbose up
 
 .PHONY: migratedown
-migratedown:
+migratedown: ## run the db migration down on the postgres docker container
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable" -verbose down
 
+.PHONY: sqlc
+sqlc: ## generate go code for sql queries
+	sqlc generate -f ./config/sqlc.yaml

@@ -1,8 +1,8 @@
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
-  "firstName" varchar,
-  "lastName" varchar NOT NULL,
-  "emailAddress" varchar NOT NULL,
+  "first_name" varchar,
+  "last_name" varchar NOT NULL,
+  "email_address" varchar NOT NULL,
   "gender" varchar NOT NULL,
   "age" int NOT NULL,
   "height" int NOT NULL,
@@ -46,7 +46,7 @@ ALTER TABLE "exercise" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id
 
 ALTER TABLE "macros" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 
-CREATE INDEX ON "accounts" ("emailAddress");
+CREATE INDEX ON "accounts" ("email_address");
 
 CREATE INDEX ON "foodlog" ("account_id");
 
