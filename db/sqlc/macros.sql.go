@@ -8,6 +8,48 @@ import (
 	"database/sql"
 )
 
+const createMacros = `-- name: CreateMacros :one
+INSERT INTO macros
+    (
+    account_id,
+    calories,
+    protein,
+    carbs,
+    fats
+) VALUES (
+    $1, $2, $3, $4, $5
+) RETURNING id, account_id, protein, fats, carbs, calories, created_at
+`
+
+type CreateMacrosParams struct {
+	AccountID sql.NullInt64 `json:"account_id"`
+	Calories  int32         `json:"calories"`
+	Protein   int32         `json:"protein"`
+	Carbs     int32         `json:"carbs"`
+	Fats      int32         `json:"fats"`
+}
+
+func (q *Queries) CreateMacros(ctx context.Context, arg CreateMacrosParams) (Macro, error) {
+	row := q.db.QueryRowContext(ctx, createMacros,
+		arg.AccountID,
+		arg.Calories,
+		arg.Protein,
+		arg.Carbs,
+		arg.Fats,
+	)
+	var i Macro
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Protein,
+		&i.Fats,
+		&i.Carbs,
+		&i.Calories,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const deleteMacros = `-- name: DeleteMacros :exec
 DELETE FROM macros
 WHERE account_id = $1
