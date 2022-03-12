@@ -56,10 +56,6 @@ lint: ## run golint on all Go package
 fmt: ## run "go fmt" on all Go packages
 	@go fmt $(PACKAGES)
 
-.PHONY: lint
-lint: ## run golint on all Go package
-	@golint $(PACKAGES)
-
 ##@ Database
 .PHONY: postgres
 postgres: ## run a postgres container in docker
