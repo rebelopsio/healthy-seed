@@ -8,10 +8,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:14
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: secret
           POSTGRES_DB: healthy-seed
         ports:
           - 5432/tcp
@@ -49,7 +49,7 @@ jobs:
 
       - name: Test
         env:
-          APP_DSN: postgres://127.0.0.1:${{ job.services.postgres.ports[5432] }}/healthy-seed?sslmode=disable&user=postgres&password=postgres
+          APP_DSN: postgres://127.0.0.1:${{ job.services.postgres.ports[5432] }}/healthy-seed?sslmode=disable&user=root&password=secret
         run: |
           make migrate
           make test-cover
