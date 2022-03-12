@@ -8,11 +8,11 @@ import (
 )
 
 type Account struct {
-	ID           int64          `json:"id"`
-	FirstName    sql.NullString `json:"first_name"`
-	LastName     string         `json:"last_name"`
-	EmailAddress string         `json:"email_address"`
-	Gender       string         `json:"gender"`
+	ID           int64  `json:"id"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	EmailAddress string `json:"email_address"`
+	Gender       string `json:"gender"`
 	// must be positive
 	Age int32 `json:"age"`
 	// must be positive

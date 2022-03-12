@@ -1,6 +1,6 @@
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
-  "first_name" varchar,
+  "first_name" varchar NOT NUll,
   "last_name" varchar NOT NULL,
   "email_address" varchar NOT NULL,
   "gender" varchar NOT NULL,
