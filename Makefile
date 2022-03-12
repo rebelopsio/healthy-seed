@@ -5,7 +5,7 @@ PACKAGES := $(shell go list ./... | grep -v /vendor/ )
 LDFLAGS := -ldflags "-X main.Version=${VERSION}"
 CONFIG_FILE ?= ./config/local.yml
 APP_DSN ?= $(shell sed -n 's/^dsn:[[:space:]]*"\(.*\)"/\1/p' $(CONFIG_FILE))
-MIGRATE := docker run -v $(shell pwd)/migration:/migration --network host migrate/migrate:v4.10.0 -path=/migration/ -database "$(APP_DSN)"
+MIGRATE := docker run -v $(shell pwd)/db/migration:/migration --network host migrate/migrate:v4.10.0 -path=/migration/ -database "$(APP_DSN)"
 
 .PHONY: default
 default: help
