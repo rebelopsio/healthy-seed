@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createAccount = `-- name: CreateAccount :one
@@ -23,13 +22,13 @@ INSERT INTO accounts (
 `
 
 type CreateAccountParams struct {
-	FirstName     sql.NullString `json:"first_name"`
-	LastName      string         `json:"last_name"`
-	EmailAddress  string         `json:"email_address"`
-	Gender        string         `json:"gender"`
-	Age           int32          `json:"age"`
-	Height        int32          `json:"height"`
-	CurrentWeight int32          `json:"current_weight"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	EmailAddress  string `json:"email_address"`
+	Gender        string `json:"gender"`
+	Age           int32  `json:"age"`
+	Height        int32  `json:"height"`
+	CurrentWeight int32  `json:"current_weight"`
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {

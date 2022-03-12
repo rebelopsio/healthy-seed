@@ -1,2 +1,2 @@
-dsn: "This is the dsn"
+dsn: "postgresql://root:secret@localhost:5432/healthy_seed?sslmode=disable"
 jwt_signing_key: "This is the jwt signing key"

@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/rebelopsio/healthy-seed/branch/main/graph/badge.svg?token=Z0ABDGEC9O)](https://codecov.io/gh/rebelopsio/healthy-seed)
 # healthy-seed 
 
 An API created to help people make healthier nutrition decisions
